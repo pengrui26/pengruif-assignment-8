@@ -1,5 +1,7 @@
-document.getElementById("experiment-form").addEventListener("submit", function(event) {
-    event.preventDefault();  // Prevent form submission
+document
+  .getElementById("experiment-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent form submission
 
     const start = parseFloat(document.getElementById("start").value);
     const end = parseFloat(document.getElementById("end").value);
@@ -7,53 +9,59 @@ document.getElementById("experiment-form").addEventListener("submit", function(e
 
     // Validation checks
     if (isNaN(start)) {
-        alert("Please enter a valid number for Shift Start.");
-        return;
+      alert("Please enter a valid number for Shift Start.");
+      return;
     }
 
     if (isNaN(end)) {
-        alert("Please enter a valid number for Shift End.");
-        return;
+      alert("Please enter a valid number for Shift End.");
+      return;
     }
 
     if (isNaN(stepNum) || stepNum <= 0) {
-        alert("Please enter a positive integer for Number of Steps.");
-        return;
+      alert("Please enter a positive integer for Number of Steps.");
+      return;
     }
 
     if (start >= end) {
-        alert("Shift Start should be smaller than Shift End.");
-        return;
+      alert("Shift Start should be smaller than Shift End.");
+      return;
     }
 
-    // If all validations pass, submit the form
+    // 清除旧图片
+    const resultsDiv = document.getElementById("results");
+    const datasetImg = document.getElementById("dataset-img");
+    const parametersImg = document.getElementById("parameters-img");
+    datasetImg.style.display = "none";
+    datasetImg.src = "";
+    parametersImg.style.display = "none";
+    parametersImg.src = "";
+
+    // Submit the form
     fetch("/run_experiment", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ start: start, end: end, step_num: stepNum })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ start: start, end: end, step_num: stepNum }),
     })
-    .then(response => response.json())
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         // Show and set images if they exist
-        const resultsDiv = document.getElementById("results");
         resultsDiv.style.display = "block";
 
-        const datasetImg = document.getElementById("dataset-img");
         if (data.dataset_img) {
-            datasetImg.src = `/${data.dataset_img}`;
-            datasetImg.style.display = "block";
+          datasetImg.src = `/${data.dataset_img}`;
+          datasetImg.style.display = "block";
         }
 
-        const parametersImg = document.getElementById("parameters-img");
         if (data.parameters_img) {
-            parametersImg.src = `/${data.parameters_img}`;
-            parametersImg.style.display = "block";
+          parametersImg.src = `/${data.parameters_img}`;
+          parametersImg.style.display = "block";
         }
-    })
-    .catch(error => {
+      })
+      .catch((error) => {
         console.error("Error running experiment:", error);
         alert("An error occurred while running the experiment.");
-    });
-});
+      });
+  });
